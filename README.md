@@ -22,3 +22,8 @@
 # 제약사항 및 가이드
 - fork를 딴 뒤, 작업 부탁드립니다.
 - Issue를 등록한 뒤, PR을 통해서 feature를 관리해주시면 더더욱 좋습니다.
+
+# Quick Start
+- Pylint
+    - pylint server.py
+    - pylint client.py
