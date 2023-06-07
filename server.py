@@ -1,6 +1,7 @@
 import socket
 from _thread import start_new_thread
 from config import *
+import json
 
 client_sockets = [] 
 
@@ -10,15 +11,16 @@ def threaded(client_socket, addr, NAME):
 
     while True:
         try:
-            data = client_socket.recv(BUF_SIZE) #1024byte
+            data = client_socket.recv(BUF_SIZE)
             if not data:
                 print(f"{NAME}님이 나갔습니다.")
                 break
-            print(f'{NAME} [{addr[IP_INDEX]}:{addr[PORT_INDEX]}] {repr(data.decode())}')
+            data = json.loads(data)['data']
+            print(f'{NAME} [{addr[IP_INDEX]}:{addr[PORT_INDEX]}] {repr(data)}')
             for client in client_sockets :
                 if client != client_socket :
-                    message = f'{NAME}: {repr(data.decode())}'
-                    client.send(message.encode())
+                    message = {'name':NAME,'msg':data}
+                    client.send(json.dumps(message).encode('UTF-8'))
 
         except Exception as e:
             print(f"{NAME}님이 나갔습니다.")
@@ -40,7 +42,7 @@ try:
         print('>> Wait')
         client_socket, addr = server_socket.accept()
         NAME = client_socket.recv(BUF_SIZE)
-        NAME = repr(NAME.decode())
+        NAME = json.loads(NAME)['name']
         client_sockets.append(client_socket)
         start_new_thread(threaded, (client_socket, addr, NAME))
         print("참가자 수 : ", len(client_sockets))
