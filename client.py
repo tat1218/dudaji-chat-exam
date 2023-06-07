@@ -1,9 +1,8 @@
 import socket
 from _thread import start_new_thread
 import sys
+from config import *
 
-HOST = '127.0.0.1'
-PORT = 9999
 if len(sys.argv) > 1:
     NAME = sys.argv[1]
 else:
@@ -14,7 +13,7 @@ client_socket.connect((HOST, PORT))
 
 def recv_data(client_socket) :
     while True :
-        data = client_socket.recv(1024)
+        data = client_socket.recv(BUF_SIZE)
         print(repr(data.decode()).replace('"',''))
 
 start_new_thread(recv_data, (client_socket,))
