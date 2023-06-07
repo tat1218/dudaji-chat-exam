@@ -1,5 +1,6 @@
 import socket
 from _thread import start_new_thread
+from config import *
 
 client_sockets = [] 
 
@@ -9,11 +10,11 @@ def threaded(client_socket, addr, NAME):
 
     while True:
         try:
-            data = client_socket.recv(1024) #1024byte
+            data = client_socket.recv(BUF_SIZE) #1024byte
             if not data:
                 print(f"{NAME}님이 나갔습니다.")
                 break
-            print(f'{NAME} [{addr[0]}:{addr[1]}] {repr(data.decode())}')
+            print(f'{NAME} [{addr[IP_INDEX]}:{addr[PORT_INDEX]}] {repr(data.decode())}')
             for client in client_sockets :
                 if client != client_socket :
                     message = f'{NAME}: {repr(data.decode())}'
@@ -28,9 +29,6 @@ def threaded(client_socket, addr, NAME):
         print('Rest Clients : ',len(client_sockets))
     client_socket.close()
 
-HOST = '127.0.0.1'
-PORT = 9999
-
 print('>> Server Start')
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #AF_INET: IP Version 4, SOCK_STREAM: TCP 패킷 허용. row/"stream"/데이터그램 socket
 server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) #포트 여러번 바인드하면 발생하는 에러 방지
@@ -41,7 +39,7 @@ try:
     while True:
         print('>> Wait')
         client_socket, addr = server_socket.accept()
-        NAME = client_socket.recv(1024)
+        NAME = client_socket.recv(BUF_SIZE)
         NAME = repr(NAME.decode())
         client_sockets.append(client_socket)
         start_new_thread(threaded, (client_socket, addr, NAME))
