@@ -1,29 +1,36 @@
+"""
+    Chat Server
+"""
+
 import socket
-from _thread import start_new_thread
-from config import *
 import json
+from _thread import start_new_thread
+from config import HOST, PORT, BUF_SIZE, IP_INDEX, PORT_INDEX
 
-client_sockets = [] 
+client_sockets = []
 
-def threaded(client_socket, addr, NAME): 
-    entering_message = f"{NAME}:{addr}님이 접속하였습니다."
+def threaded(client_socket, client_addr, client_name):
+    '''
+        Thread function for handling client socket
+    '''
+    entering_message = f"{client_name}:{client_addr}님이 접속하였습니다."
     print(entering_message)
 
     while True:
         try:
             data = client_socket.recv(BUF_SIZE)
             if not data:
-                print(f"{NAME}님이 나갔습니다.")
+                print(f"{client_name}님이 나갔습니다.")
                 break
             data = json.loads(data)['data']
-            print(f'{NAME} [{addr[IP_INDEX]}:{addr[PORT_INDEX]}] {repr(data)}')
+            print(f'{client_name} [{client_addr[IP_INDEX]}:{client_addr[PORT_INDEX]}] {repr(data)}')
             for client in client_sockets :
                 if client != client_socket :
-                    message = {'name':NAME,'msg':data}
+                    message = {'name':client_name,'msg':data}
                     client.send(json.dumps(message).encode('UTF-8'))
 
-        except Exception as e:
-            print(f"{NAME}님이 나갔습니다.")
+        except Exception:
+            print(f"{client_name}님이 나갔습니다.")
             break
 
     if client_socket in client_sockets :
@@ -50,4 +57,3 @@ except Exception as e :
     print ('에러는? : ',e)
 finally:
     server_socket.close()
-

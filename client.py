@@ -1,8 +1,12 @@
+"""
+    Chat Client
+"""
+
 import socket
-from _thread import start_new_thread
 import sys
-from config import *
 import json
+from _thread import start_new_thread
+from config import HOST, PORT, BUF_SIZE
 
 if len(sys.argv) > 1:
     NAME = sys.argv[1]
@@ -13,6 +17,9 @@ client_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 client_socket.connect((HOST, PORT))
 
 def recv_data(client_socket) :
+    '''
+        Thread function for receiving data from server
+    '''
     while True :
         data = client_socket.recv(BUF_SIZE)
         data = json.loads(data)
