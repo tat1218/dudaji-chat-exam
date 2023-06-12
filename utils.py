@@ -34,14 +34,13 @@ class SocketManager:
         data_length = len(byte_data)
         self.socket.send(f"{data_length:<{HEADER_LENGTH}}".encode())
         if MAX_LENGTH < data_length:
-            return -1
+            return
         start_idx = 0
         end_idx = BUF_SIZE
         while start_idx < data_length:
             self.socket.send(byte_data[start_idx:end_idx])
             start_idx = end_idx
             end_idx = min(end_idx+BUF_SIZE,data_length)
-        return data_length
 
     def recv(self):
         '''

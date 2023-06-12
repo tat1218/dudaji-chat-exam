@@ -51,13 +51,13 @@ while True:
         if message == 'quit':
             break
         socket_controller.set_command(utils.SendCommand(socket_manager,NAME,message))
-        send_length = socket_controller.do_command()
-        if send_length == -1:
-            socket_controller.set_command(recv_command)
-            socket_controller.do_command()
-
-    except ConnectionResetError as e:
+        socket_controller.do_command()
+    except ConnectionResetError as re:
         logger.info("Server shuts down.")
-        logger.debug(f"ERROR : {e}")
+        logger.debug(f"ERROR : {re}")
+        break
+    except ConnectionAbortedError as ae:
+        logger.info("경고 3회 누적으로 밴 당했습니다.")
+        logger.debug(f"ERROR : {ae}")
         break
 socket_manager.close()
