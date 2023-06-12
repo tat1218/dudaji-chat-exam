@@ -13,6 +13,9 @@ from logger import make_logger
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--name",type=str,default="Unknown",help="User name. Default=Unknown")
+parser.add_argument("--host",type=str,default=HOST,help="Host IP. Default=Localhost")
+parser.add_argument("--port",type=int,default=PORT,help="port to use. Default=9999")
+
 args = parser.parse_args()
 NAME = args.name
 logger = make_logger(NAME)
@@ -21,7 +24,7 @@ if len(NAME) > 10:
     sys.exit()
 
 client_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-client_socket.connect((HOST, PORT))
+client_socket.connect((args.host, args.port))
 socket_controller = utils.SocketController()
 socket_manager = utils.SocketManager(client_socket)
 recv_command = utils.RecvCommand(socket_manager)
