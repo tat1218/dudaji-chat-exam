@@ -44,7 +44,6 @@ def threaded(socket_manager, client_addr):
                 logger.info(f"{client_name}님이 나갔습니다.")
                 break
             logger.info(f'{client_name}({client_addr[IP_INDEX]}:{client_addr[PORT_INDEX]}) : {repr(message)}')
-            socket_controller.set_command(utils.SendCommand(socket_manager,client_name,message))
             for client_socket_manager in client_socket_managers :
                 if client_socket_manager != socket_manager :
                     socket_controller.set_command(utils.SendCommand(client_socket_manager, client_name, message))
