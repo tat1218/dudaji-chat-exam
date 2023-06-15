@@ -25,9 +25,7 @@ if len(NAME) > 10:
 
 client_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 client_socket.connect((args.host, args.port))
-socket_controller = utils.SocketController()
 socket_manager = utils.SocketManager(client_socket)
-recv_command = utils.RecvCommand(socket_manager)
 
 def recv_data() :
     '''
@@ -35,26 +33,25 @@ def recv_data() :
     '''
     while True :
         try:
-            socket_controller.set_command(recv_command)
-            name, message = socket_controller.do_command()
+            name, message = socket_manager.recv()
             logger.info(f"{name} : {repr(message)}")
         except Exception:
             logger.debug("client 종료")
             break
 
 start_new_thread(recv_data, ())
-socket_controller.set_command(utils.SendCommand(socket_manager,NAME,""))
-socket_controller.do_command()
+socket_manager.send(NAME,"")
 logger.info(f'{NAME}님이 접속하였습니다.')
 
 while True:
     try:
         message = input('')
         logger.debug(message)
+        if socket_manager.send(NAME,message) == -1:
+            logger.info("에러가 발생하여 전송이 완료되지 않았습니다.")
         if message == 'quit':
             break
-        socket_controller.set_command(utils.SendCommand(socket_manager,NAME,message))
-        socket_controller.do_command()
+        
     except ConnectionResetError as re:
         logger.info("Server shuts down.")
         logger.debug(f"ERROR : {re}")

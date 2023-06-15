@@ -12,14 +12,11 @@ from logger import make_logger
 client_socket_managers = []
 logger = make_logger("server")
 
-def threaded(socket_manager, client_addr):
+def threaded(socket_manager:utils.SocketManager, client_addr):
     '''
         Thread function for handling client socket
     '''
-    socket_controller = utils.SocketController()            # invoker
-    recv_command = utils.RecvCommand(socket_manager)        # command
-    socket_controller.set_command(recv_command)
-    client_name, _ = socket_controller.do_command()
+    client_name, _ = socket_manager.recv()
     entering_message = f"{client_name}:{client_addr}님이 접속하였습니다."
     logger.info(entering_message)
 
@@ -27,27 +24,27 @@ def threaded(socket_manager, client_addr):
 
     while True:
         try:
-            socket_controller.set_command(recv_command)
-            name, message = socket_controller.do_command()
+            name, message = socket_manager.recv()
             if name is None:
                 warning_count += 1
                 logger.info(f"{client_name}님이 너무 긴 메시지를 보내려 했습니다. 경고 {warning_count}회")
-                socket_controller.set_command(utils.SendCommand(socket_manager, "server", f"메시지가 너무 깁니다. 경고 {warning_count}회. 3회 경고시 접속이 종료됩니다."))
-                socket_controller.do_command()
+                socket_manager.send("server", f"메시지가 너무 깁니다. 경고 {warning_count}회. 3회 경고시 접속이 종료됩니다.")
 
                 if warning_count >= 3:
                     logger.info(f"{client_name}님이 강퇴당했습니다.")
                     break
                 continue
 
-            if not message:
-                logger.info(f"{client_name}님이 나갔습니다.")
-                break
             logger.info(f'{client_name}({client_addr[IP_INDEX]}:{client_addr[PORT_INDEX]}) : {repr(message)}')
+            
+            if message == "quit":
+                logger.info(f"{client_name}님이 접속을 종료했습니다.")
+                break
+
             for client_socket_manager in client_socket_managers :
                 if client_socket_manager != socket_manager :
-                    socket_controller.set_command(utils.SendCommand(client_socket_manager, client_name, message))
-                    socket_controller.do_command()
+                    client_socket_manager.send(client_name,message)
+
         except Exception as e_thread:
             logger.debug(e_thread)
             logger.info(f"{client_name}님이 나갔습니다.")
