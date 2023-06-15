@@ -16,8 +16,6 @@ class SocketManager:
     def send(self, name, message):
         '''
             send logic. input {name,message} pair
-            send success -> return send data length
-            send failure -> return -1
         '''
 
         data = {'name':name,'message':message}
