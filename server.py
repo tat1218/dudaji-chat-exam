@@ -36,7 +36,7 @@ def threaded(socket_manager:utils.SocketManager, client_addr):
                 continue
 
             logger.info(f'{client_name}({client_addr[IP_INDEX]}:{client_addr[PORT_INDEX]}) : {repr(message)}')
-
+            
             if message == "quit":
                 logger.info(f"{client_name}님이 접속을 종료했습니다.")
                 break
